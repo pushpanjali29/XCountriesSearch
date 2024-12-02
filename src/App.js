@@ -16,12 +16,35 @@ const App = () => {
         setFilteredCountries(data);
         setLoading(false);
       })
-     
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setError(error);
+        setLoading(false);
+      });
   }, []);
+
+  useEffect(() => {
+    if (searchTerm === "") {
+      setFilteredCountries(countries);
+    } else {
+      const filtered = countries.filter((country) =>
+        country?.name?.common.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredCountries(filtered);
+    }
+  }, [searchTerm, countries]);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
+
+  if (loading) {
+    return <h2>Loading...</h2>;
+  }
+
+  if (error) {
+    return <h2>Error fetching data: {error.message}</h2>;
+  }
 
   return (
     <div className="app-container">
@@ -34,6 +57,7 @@ const App = () => {
         className="search-box"
       />
       </form>
+      <br/>
       <div className="grid-container">
         {filteredCountries.map((country) => (
           <div className="countryCard" key={country?.name?.common}>
